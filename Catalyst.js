@@ -12,9 +12,8 @@
     }
 }(this, function () {
 /**
- * Catalyst
- * The Catalyst module.
- * @author whytheplatypus
+ * Attach event handlers to the objects
+ * @param {Object} obj The object to become an event listener
  */
   function Catalyst(obj){
     obj = obj.prototype===undefined?obj:obj.prototype;
