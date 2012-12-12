@@ -5,12 +5,12 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
       // AMD. Register as an anonymous module.
-      define([], factory);
+      define(['./libs/watch'], factory);
     } else {
         // Browser globals
-        root.Catalyst = factory();
+        root.Catalyst = factory(WatchJS);
     }
-}(this, function () {
+}(this, function (WatchJS) {
 /**
  * Attach event handlers to the objects
  * @param {Object} obj The object to become an event listener
@@ -73,7 +73,7 @@
     };
 
     //adapted from https://github.com/melanke/Watch.JS
-    function watchSetter(obj, propName){
+    /*function watchSetter(obj, propName){
       var oldValue = obj[propName];
       var set = function(newValue){
         obj.trigger({type:'change:'+propName, old:oldValue, new:newValue});
@@ -99,7 +99,7 @@
       try {
         Object.defineProperty(obj, propName, {
           get: function(){return obj[propName];},
-          set: function(val){obj[propName]=val;},
+          set: undefined,
           enumerable: true,
           configurable: true
         });
@@ -111,14 +111,19 @@
             throw "watchJS error: browser not supported :/"
         }
       }
-    }
+    }*/
+
+    function _watchTrigger(prop, action, newvalue, oldvalue){
+      //console.log(prop+" - action: "+action+" - new: "+newvalue+", old: "+oldvalue);
+      obj.trigger({type:action+':'+prop, old:oldvalue, new:newvalue, self:obj});
+    };
 
     /**
      * Watch a given property
      * @param  {String} prop The name of the property to watch
      */
     obj.watch = function(prop){
-      watchSetter(this, prop);
+      WatchJS.watch(obj, prop, _watchTrigger, 2);
     };
 
     /**
@@ -126,10 +131,7 @@
      * @param  {String} prop The name fo the property
      */
     obj.unwatch = function(prop){
-      //remove all the listeners?
-      this.events['change:'+prop] = null;
-      delete this.events['change:'+prop];
-      unwatchSetter(this, prop);
+      WatchJS.unwatch(obj, prop, _watchTrigger);
     };
   };
 
